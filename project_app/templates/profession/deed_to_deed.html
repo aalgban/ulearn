@@ -1,0 +1,175 @@
+{% block content %}
+<style>
+  body {
+    background-color: #f0f8ff; /* Light sky blue */
+    color: #000080; /* Navy blue for text */
+    font-family: 'Roboto', sans-serif;
+  }
+  h1 {
+    color: #4682b4; /* Steel blue */
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  h3 {
+    color: #5f9ea0; /* Cadet blue */
+    font-size: 1.8rem;
+    margin-top: 20px;
+  }
+  .btn-dark {
+    background-color: #4682b4;
+    border-color: #4682b4;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  .btn-dark:hover {
+    background-color: #5f9ea0;
+    border-color: #5f9ea0;
+  }
+  .table {
+    background-color: #ffffff; /* White background for tables */
+    margin-top: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .thead-dark {
+    background-color: #4682b4;
+    color: white;
+  }
+  .table th, .table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  canvas {
+    background-color: #f0f8ff; /* Light sky blue */
+    border: 1px solid #4682b4; /* Steel blue border */
+    border-radius: 5px;
+    margin-top: 20px;
+  }
+</style>
+
+<div class="container mt-4">
+  <h1>{{ profession.title }} - Insights</h1>
+
+  <!-- Back Button -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <a href="javascript:history.back()" class="btn btn-dark">Back</a>
+  </div>
+
+  <!-- Salary Dynamics by Year Table and Graph -->
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Salary Dynamics by Year</h3>
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>Year</th>
+            <th>Average Salary (RUB)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for year, avg_salary in salary_dynamics.items %}
+            <tr>
+              <td>{{ year }}</td>
+              <td>{{ avg_salary|floatformat:2 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <h3>Salary Dynamics by Year (Graph)</h3>
+      <canvas id="salaryChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Vacancies Dynamics by Year Table and Graph -->
+  <div class="row mt-5">
+    <div class="col-md-6">
+      <h3>Vacancies Dynamics by Year</h3>
+      <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th>Year</th>
+            <th>Number of Vacancies</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in vacancies_by_year %}
+            <tr>
+              <td>{{ item.year }}</td>
+              <td>{{ item.count }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <h3>Vacancies Dynamics by Year (Graph)</h3>
+      <canvas id="vacanciesChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Data for Salary Dynamics Chart
+  var salaryData = {
+    labels: [{% for year in salary_dynamics.keys %}'{{ year }}',{% endfor %}],
+    datasets: [{
+      label: 'Average Salary (RUB)',
+      data: [{% for avg_salary in salary_dynamics.values %}{{ avg_salary|floatformat:2 }},{% endfor %}],
+      borderColor: 'rgba(70, 130, 180, 1)', // Steel blue
+      backgroundColor: 'rgba(70, 130, 180, 0.2)', // Transparent steel blue
+      borderWidth: 2
+    }]
+  };
+
+  var salaryConfig = {
+    type: 'line',
+    data: salaryData,
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  };
+
+  new Chart(document.getElementById('salaryChart'), salaryConfig);
+
+  // Data for Vacancies Dynamics Chart
+  var vacanciesData = {
+    labels: [{% for item in vacancies_by_year %}'{{ item.year }}',{% endfor %}],
+    datasets: [{
+      label: 'Number of Vacancies',
+      data: [{% for item in vacancies_by_year %}{{ item.count }},{% endfor %}],
+      borderColor: 'rgba(95, 158, 160, 1)', // Cadet blue
+      backgroundColor: 'rgba(95, 158, 160, 0.2)', // Transparent cadet blue
+      borderWidth: 2
+    }]
+  };
+
+  var vacanciesConfig = {
+    type: 'bar',
+    data: vacanciesData,
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  };
+
+  new Chart(document.getElementById('vacanciesChart'), vacanciesConfig);
+</script>
+{% endblock %}

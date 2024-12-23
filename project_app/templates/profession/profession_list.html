@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Алжабан Абдурахман</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> <!-- Google Fonts -->
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #f9fafb;
+            color: #2c3e50;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(90deg, #3498db, #9b59b6);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Navigation */
+        nav {
+            background: #34495e;
+            padding: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin: 0 1rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        nav ul li a:hover {
+            background: #1abc9c;
+            transform: translateY(-3px);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            color: #2980b9;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profession {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profession:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .profession h3 {
+            color: #e74c3c;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .profession p {
+            color: #2c3e50;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .button {
+            display: inline-block;
+            background: #1abc9c;
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .button:hover {
+            background: #16a085;
+            transform: translateY(-3px);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #34495e;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #1abc9c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Styling for Pie Chart */
+        .pie-chart {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Professions List</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="{% url 'profession_list' %}">Profession</a></li>
+            <li><a href="{% url 'general_statistics' %}">Statistics</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2>Profession Details</h2>
+
+        {% for profession in professions %}
+        <div class="profession">
+            <h3>{{ profession.title }}</h3>
+            <p><strong>Salary Range:</strong> ${{ profession.salary_from }} - ${{ profession.salary_to }}</p>
+            <p><strong>City:</strong> {{ profession.city }}</p>
+            <p><strong>Key Skills:</strong> {{ profession.key_skills }}</p>
+            <p><strong>Description:</strong> {{ profession.description }}</p>
+            <p><strong>Date Posted:</strong> {{ profession.date_posted }}</p>
+
+            <!-- Add Chart for Salary Distribution -->
+            <div class="chart-container">
+            </div>
+            <script>
+                var ctx = document.getElementById('salaryChart-{{ profession.id }}').getContext('2d');
+                var salaryChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Min Salary', 'Max Salary'],
+                        datasets: [{
+                            label: 'Salary Distribution',
+                            data: [{{ profession.salary_from }}, {{ profession.salary_to }}],
+                            backgroundColor: ['rgba(230, 0, 0, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgba(230, 0, 0, 1)', 'rgba(255, 99, 132, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+
+            <!-- Add Pie Chart for Key Skills Distribution -->
+            <div class="pie-chart">
+                <canvas id="skillsChart-{{ profession.id }}"></canvas>
+            </div>
+            <script>
+                var skills = "{{ profession.key_skills }}".split(',');  // Split key_skills string into an array
+                var skillCount = skills.length;
+                var skillsData = new Array(skillCount).fill(100 / skillCount);  // Simple example: distribute equally
+
+                var ctxSkills = document.getElementById('skillsChart-{{ profession.id }}').getContext('2d');
+                var skillsChart = new Chart(ctxSkills, {
+                    type: 'pie',
+                    data: {
+                        labels: skills,  // Use dynamic skills
+                        datasets: [{
+                            label: 'Key Skills Distribution',
+                            data: skillsData,  // Use dynamic data
+                            backgroundColor: ['rgba(52, 152, 219, 0.6)', 'rgba(0, 0, 0, 0.6)', 'rgba(255, 165, 0, 0.6)', 'rgba(39, 174, 96, 0.6)'],
+                            borderColor: ['rgba(52, 152, 219, 1)', 'rgba(0, 0, 0, 1)', 'rgba(255, 165, 0, 1)', 'rgba(39, 174, 96, 1)'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2) + '%'; // Show percentage
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+
+            <a href="{% url 'deed_to_deed' profession.id %}" class="button">Click here to see deed-to-deed details</a>
+            <a href="{% url 'geography' profession.id %}" class="button">View Geography</a>
+            <a href="{% url 'skills_view' profession.id %}" class="button">View Skills</a>
+            <a href="{% url 'last_vacancies' profession.id %}" class="button">View Last Vacancies</a>
+        </div>
+        {% endfor %}
+    </main>
+
+    <footer>
+        <p>Full Name: Алжабан Абдурахман | Academic Group: Ри-230944</p>
+    </footer>
+</body>
+</html>
